@@ -1,0 +1,13 @@
+version: '3'
+services:
+  search:
+    image: 'docker.elastic.co/elasticsearch/elasticsearch:7.2.0'
+    environment:
+      - discovery.type=single-node
+      - indices.fielddata.cache.size=0
+    networks:
+      mesh:
+        aliases:
+          - search.local
+networks:
+  mesh: {}
