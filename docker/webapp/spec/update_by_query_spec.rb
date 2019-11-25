@@ -46,9 +46,9 @@ describe do
       }
     end
 
-    subject { client.search(index: index, body: { query: query })['hits']['hits'] }
-    it { expect(subject.size).to eq 1 }
-    it { expect(subject.first['_source']['num']).to be_nil }
+    let(:search_result) { client.search(index: index, body: { query: query })['hits']['hits'] }
+    it { expect(search_result.size).to eq 1 }
+    it { expect(search_result.first['_source']['num']).to be_nil }
 
     context do
       before do
@@ -64,7 +64,7 @@ describe do
         client.indices.refresh(index: index)
       end
 
-      it { expect(subject.first['_source']['num']).to eq 123}
+      it { expect(search_result.first['_source']['num']).to eq 123}
     end
   end
 end
