@@ -19,6 +19,18 @@ describe do
       'bar 2',
       'bar 3',
     ]
+    client.indices.create(
+      index: index,
+      body: {
+        mappings: {
+          properties: {
+            title: {
+              type: 'keyword'
+            }
+          }
+        }
+      }
+    )
     titles.each do |t|
       client.index(
         index: index,
@@ -34,7 +46,23 @@ describe do
     client.indices.delete(index: index)
   end
 
-  context do
+  context 'match.term.key.value' do
+    let(:query) do
+      {
+        term: {
+          title: {
+            value: 'foo 1'
+          }
+        }
+      }
+    end
+
+    let(:search_result) { client.search(index: index, body: { query: query })['hits']['hits'] }
+    it { expect(search_result.size).to eq 1 }
+    it { expect(search_result.first['_source']['num']).to be_nil }
+  end
+
+  context 'match.key.query' do
     let(:query) do
       {
         match: {
