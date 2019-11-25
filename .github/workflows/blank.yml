@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    path: path/to/not_found
+    paths: path/to/not_found
 
 jobs:
   build:
