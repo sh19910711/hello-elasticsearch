@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe do
-  INDEX_NAME = 'items'
+  let(:index) { SecureRandom.uuid }
 
   let(:client) do
     Elasticsearch::Client.new(
@@ -13,15 +13,15 @@ describe do
 
   before do
     begin
-      client.indices.delete(index: INDEX_NAME)
+      client.indices.delete(index: index)
     rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
-      puts "Ignore deleting index #{INDEX_NAME}"
+      puts "Ignore deleting index #{index}"
     end
   end
 
   before do
     client.index(
-      index: INDEX_NAME,
+      index: index,
       body: {
         hello: 'world',
       }
@@ -29,7 +29,7 @@ describe do
   end
 
   before do
-    client.indices.refresh(index: INDEX_NAME)
+    client.indices.refresh(index: index)
   end
 
   context 'search world' do

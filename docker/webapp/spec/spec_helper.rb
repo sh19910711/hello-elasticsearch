@@ -1,1 +1,2 @@
 require 'elasticsearch'
+require 'securerandom'
