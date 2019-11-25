@@ -12,7 +12,11 @@ describe do
   end
 
   before do
-    client.indices.delete(index: INDEX_NAME)
+    begin
+      client.indices.delete(index: INDEX_NAME)
+    rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
+      puts "Ignore deleting index #{INDEX_NAME}"
+    end
   end
 
   before do
