@@ -1,5 +1,14 @@
 version: '3'
 services:
+  webapp:
+    build: ./docker/webapp
+    volumes:
+      - ./docker/webapp:/webapp
+    command: bundle exec rackup --host 0.0.0.0
+    networks:
+      mesh:
+        aliases:
+          - webapp.local
   search:
     image: 'docker.elastic.co/elasticsearch/elasticsearch:7.2.0'
     environment:
