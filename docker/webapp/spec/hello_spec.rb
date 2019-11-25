@@ -12,14 +12,6 @@ describe do
   end
 
   before do
-    begin
-      client.indices.delete(index: index)
-    rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
-      puts "Ignore deleting index #{index}"
-    end
-  end
-
-  before do
     client.index(
       index: index,
       body: {
@@ -32,8 +24,12 @@ describe do
     client.indices.refresh(index: index)
   end
 
+  after do
+    client.indices.delete(index: index)
+  end
+
   context 'search world' do
-    subject { client.search(q: 'world')['hits']['hits'].first['_source']['hello'] }
+    subject { client.search(index: index, q: 'world')['hits']['hits'].first['_source']['hello'] }
     it { should eq 'world' }
   end
 end
