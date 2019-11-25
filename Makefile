@@ -5,4 +5,4 @@ build:
 
 .PHONY: test
 test:
-	docker-compose exec webapp bundle exec rspec
+	docker-compose exec -T webapp bundle exec rspec
