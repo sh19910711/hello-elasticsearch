@@ -36,6 +36,7 @@ describe do
         index: index,
         body: {
           title: t,
+          tags: [],
         }
       )
     end
@@ -78,7 +79,7 @@ describe do
     it { expect(search_result.size).to eq 1 }
     it { expect(search_result.first['_source']['num']).to be_nil }
 
-    context do
+    context 'num' do
       before do
         client.update_by_query(
           index: index,
@@ -93,6 +94,45 @@ describe do
       end
 
       it { expect(search_result.first['_source']['num']).to eq 123}
+    end
+
+    context do
+      before do
+        ['item 1', 'item 2', 'item 3'].each do |s|
+          client.update_by_query(
+            index: index,
+            body: {
+              query: query,
+              script: {
+                source: "ctx._source.tags.add('#{s}');"
+              }
+            }
+          )
+          client.indices.refresh(index: index)
+        end
+      end
+
+      subject { search_result.first['_source']['tags'] }
+      it { should include 'item 1'}
+
+      context do
+        before do
+          client.update_by_query(
+            index: index,
+            body: {
+              query: query,
+              script: {
+                source: 'ctx._source.tags.remove(ctx._source.tags.indexOf(\'item 1\'))'
+              }
+            }
+          )
+          client.indices.refresh(index: index)
+        end
+
+        it { should_not include 'item 1' }
+        it { should include 'item 2' }
+        it { should include 'item 3' }
+      end
     end
   end
 end
