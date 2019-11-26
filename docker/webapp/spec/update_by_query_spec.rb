@@ -134,5 +134,42 @@ describe do
         it { should include 'item 3' }
       end
     end
+
+    context do
+      before do
+        ['item 1', 'item 2', 'item 2', 'item 3'].each do |s|
+          client.update_by_query(
+            index: index,
+            body: {
+              query: query,
+              script: {
+                source: "ctx._source.tags.add('#{s}');"
+              }
+            }
+          )
+          client.indices.refresh(index: index)
+        end
+      end
+
+      subject { search_result.first['_source']['tags'] }
+      it { should include 'item 1'}
+
+      context do
+        before do
+          client.update_by_query(
+            index: index,
+            body: {
+              query: query,
+              script: {
+                source: 'ctx._source.tags = ctx._source.tags.stream().distinct().sorted().collect(Collectors.toList())'
+              }
+            }
+          )
+          client.indices.refresh(index: index)
+        end
+
+        it { should eq ['item 1', 'item 2', 'item 3'] }
+      end
+    end
   end
 end
